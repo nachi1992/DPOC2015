@@ -49,9 +49,12 @@ global H;
 global space;
 global n_states;
 global camera;
+global Mansion;
 global Map;
+global F;
 space = stateSpace;
 camera = cameras;
+Mansion =mansion;
 Map = map';
 n_states = size(stateSpace,1);
 n_input  =  size(controlSpace,1);
@@ -66,18 +69,23 @@ for l=1:n_input
             p_det = cam_detect_prob(j);
             gate_state = cord2idx(gate(1),gate(2));
             if(p_det>0)
-                j
-                gate_state
-                p_det
+                
                 P(i,gate_state,l)= p_det;
+                if(i~= gate_state)
                 P(i,j,l)= 1- p_det;
+                end
             else 
-                P(i,j,l)= 1- p_det;
+               
+                if(l==5)
+                    pc = mansion_detect_prob(i);
+                    P(i,i,l)=1-pc;
+                else
+                    P(i,j,l)= 1;
+                end
             end
+        end
             
         end
-end
-
 end
             
 function j = nextState(i,l)
@@ -127,12 +135,13 @@ function p_det = cam_detect_prob(j)
     global Map;
     [x,y]= idx2cord(j);   
     p_det = 0;
+    p_a = zeros(H,1);
     p_det_u =1;
-    
     for i=1:H
         camx = camera(i,1,:);
         camy = camera(i,2,:);
          ux = 0; uy=0;  
+         
         if(x== camx)
            % display('cam_sight x');
             if(y<camy)
@@ -142,19 +151,20 @@ function p_det = cam_detect_prob(j)
                 inity = camy;
                 finy = y;
             end
-            obj=0;
-            for m=inity+1:finy-1
-                if(Map(x,m)>0)
-                    obj= obj+1;
-                end
-            end
+             obj=0;
+             for m=inity+1:finy-1
+                 if(Map(x,m)>0)
+                     obj= obj+1;
+                 end
+             end
             
             if(obj==0)
-                if(p_det>0)
-                p_det_u = p_det_u*p_det;
-                ux =1;
-                end;    
-                p_det = p_det+camera(i,3,:)/abs(finy-inity);    
+            %   if(p_det>0)
+            %    p_det_u = p_det_u*p_det;
+            %    ux =1;
+            %    end;    
+                p_a(i) = (camera(i,3,:)/abs(finy-inity));    
+            
             end
         end
         
@@ -167,27 +177,91 @@ function p_det = cam_detect_prob(j)
                 initx = camx;
                 finx = x;
              end
-            obj= 0;
-           
-            for m=initx+1:finx-1
-                if(Map(m,y)>0)
-                    obj= obj+1;
-                end
-            end
+             obj= 0;
+            
+             for m=initx+1:finx-1
+                 if(Map(m,y)>0)
+                     obj= obj+1;
+                 end
+             end
             
             if(obj==0)
-                if(p_det>0)
-                p_det_u = p_det_u*p_det;
-                uy =1;
-                end;
-                p_det = p_det+camera(i,3,:)/abs(finx-initx);
-               
+         %       if(p_det>0)
+         %       p_det_u = p_det_u*p_det;
+         %       uy =1;
+         %      end;
+                p_a(i) = (camera(i,3,:)/abs(finx-initx));
             end
         end
         
-        if (ux==1 || uy == 1)
-            p_det = p_det - p_det_u;
-        end
+     %   if (ux==1 || uy == 1)
+     %       p_det = p_det - p_det_u;
+     %   end
+        p_a = 
+     
     end
             
+end
+
+function pc = mansion_detect_prob(i)
+
+global F;
+global Mansion;
+global Map;
+global p_c;
+global gamma_p;
+  [x,y]= idx2cord(i);   
+    pc = p_c;
+    
+    
+    for i=1:F
+        manx = Mansion(i,1,:);
+        many = Mansion(i,2,:);
+           
+        if(x== manx)
+           
+            if(y<many)
+                inity = y;
+                finy = many;
+            else 
+                inity = many;
+                finy = y;
+            end
+             obj=0;
+             for m=inity+1:finy-1
+                 if(Map(x,m)>0)
+                     obj= obj+1;
+                 end
+             end
+            
+            if(obj==0)
+             pc = max(p_c, gamma_p/abs(finy-inity));
+            else
+             pc=p_c;
+            end
+            
+        end
+        
+        if( y == many)
+           if(x<manx)
+                initx = x;
+                finx = manx;
+            else 
+                initx = manx;
+                finx = x;
+            end
+             obj=0;
+             for m=initx+1:finx-1
+                 if(Map(m,y)>0)
+                     obj= obj+1;
+                 end
+             end
+            
+            if(obj==0)
+             pc = max(p_c, gamma_p/abs(finx-initx));
+            else
+             pc= p_c;
+            end
+        end
+    end   
 end
