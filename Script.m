@@ -83,7 +83,7 @@ if true % Change this to true to test your implementation
 end
 
 %% compute stage costs
-if false % Change this to true to test your implementation
+if true % Change this to true to test your implementation
     disp('compute stage costs');
     G = ComputeStageCosts( stateSpace, controlSpace, ...
         map, gate, mansion, cameras );

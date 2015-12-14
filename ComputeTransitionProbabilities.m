@@ -42,7 +42,6 @@ function P = ComputeTransitionProbabilities( stateSpace, controlSpace, map, gate
 %           from state i to state j if control input l is applied.
 
 % put your code here
-syms a b c d;
 global M;
 global N;
 global H;
@@ -66,6 +65,12 @@ P = zeros(n_states,n_states,n_input);
 for l=1:n_input
         for i = 1:n_states
             j = nextState(i,l);  
+            if(l==5)
+                    pc = mansion_detect_prob(j);
+                    P(i,i,l)=1-pc;
+            else
+                    P(i,j,l)= 1;
+             end
             p_det = cam_detect_prob(j);
             gate_state = cord2idx(gate(1),gate(2));
             if(p_det>0)
@@ -74,19 +79,16 @@ for l=1:n_input
                 if(i~= gate_state)
                 P(i,j,l)= 1- p_det;
                 end
-            else 
+            end 
                
-                if(l==5)
-                    pc = mansion_detect_prob(i);
-                    P(i,i,l)=1-pc;
-                else
-                    P(i,j,l)= 1;
-                end
-            end
+                
         end
-            
-        end
+        
 end
+
+
+end
+
             
 function j = nextState(i,l)
  [x,y] =  idx2cord(i);   
@@ -199,11 +201,11 @@ function p_det = cam_detect_prob(j)
      %   end
      
          p_a = p_a((p_a>0));
-         if(size(p_a)==1)
+         if(size(p_a)>0)
 %             p_det = p_a;
 %         elseif(size(p_a)==2)
 %             p_det = p_a()
-        p_det = probUnion(p_a);
+          p_det = probUnion(p_a);
          else
              p_det =0;
          end
