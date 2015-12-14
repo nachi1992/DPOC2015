@@ -42,7 +42,7 @@ function P = ComputeTransitionProbabilities( stateSpace, controlSpace, map, gate
 %           from state i to state j if control input l is applied.
 
 % put your code here
-
+syms a b c d;
 global M;
 global N;
 global H;
@@ -197,8 +197,17 @@ function p_det = cam_detect_prob(j)
      %   if (ux==1 || uy == 1)
      %       p_det = p_det - p_det_u;
      %   end
-        p_a = 
      
+         p_a = p_a((p_a>0));
+         if(size(p_a)==1)
+%             p_det = p_a;
+%         elseif(size(p_a)==2)
+%             p_det = p_a()
+        p_det = probUnion(p_a);
+         else
+             p_det =0;
+         end
+                
     end
             
 end
@@ -264,4 +273,14 @@ global gamma_p;
             end
         end
     end   
+end
+
+function prob = probUnion(probvec) 
+  if (length(probvec) == 1)
+    prob = probvec;
+  else
+    a = probvec(1);
+    b = probUnion(probvec(2:end));
+    prob = a + b - a*b;
+  end
 end
