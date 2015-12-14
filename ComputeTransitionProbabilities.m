@@ -55,15 +55,14 @@ camera = cameras;
 Map = map';
 n_states = size(stateSpace,1);
 n_input  =  size(controlSpace,1);
-M = size(map,1);
-N = size(map,2);
+M = size(Map,1);
+N = size(Map,2);
 H = size(cameras,1);
 F = size(mansion,1);
 P = zeros(n_states,n_states,n_input);
 for l=1:n_input
         for i = 1:n_states
             j = nextState(i,l);  
-            P(i,j,l)= 1;
             p_det = cam_detect_prob(j);
             gate_state = cord2idx(gate(1),gate(2));
             if(p_det>0)
@@ -72,7 +71,8 @@ for l=1:n_input
                 p_det
                 P(i,gate_state,l)= p_det;
                 P(i,j,l)= 1- p_det;
-            
+            else 
+                P(i,j,l)= 1- p_det;
             end
             
         end
@@ -84,6 +84,7 @@ function j = nextState(i,l)
  [x,y] =  idx2cord(i);   
  global M;
  global N;
+ global Map;
  switch l
      case 1
         y = y+1;
@@ -95,13 +96,10 @@ function j = nextState(i,l)
         x = x+1;
      case 5  
  end
- if(x<1 || x>M || y<1 || y>N )
-     [x,y] =  idx2cord(i);
-     display('out of bounds..adjusting');
- end
  j = cord2idx(x,y);
- if(j==0)
+ if(x<1 || x>M || y<1 || y>N || Map(x,y)>0)
      j=i;
+     display('out of bounds..adjusting');
  end
  
 end
@@ -121,7 +119,6 @@ function j =  cord2idx(x,y)
        return;
      end
  end
- j=0;
 end
 
 function p_det = cam_detect_prob(j)
@@ -130,10 +127,12 @@ function p_det = cam_detect_prob(j)
     global Map;
     [x,y]= idx2cord(j);   
     p_det = 0;
+    p_det_u =1;
+    
     for i=1:H
         camx = camera(i,1,:);
         camy = camera(i,2,:);
-            
+         ux = 0; uy=0;  
         if(x== camx)
            % display('cam_sight x');
             if(y<camy)
@@ -144,16 +143,21 @@ function p_det = cam_detect_prob(j)
                 finy = y;
             end
             obj=0;
-            for m=inity:finy-1
+            for m=inity+1:finy-1
                 if(Map(x,m)>0)
                     obj= obj+1;
                 end
             end
             
             if(obj==0)
-                p_det = camera(i,3,:)/(finy-inity);
+                if(p_det>0)
+                p_det_u = p_det_u*p_det;
+                ux =1;
+                end;    
+                p_det = p_det+camera(i,3,:)/abs(finy-inity);    
             end
         end
+        
         if( y == camy)
            %  display('cam_sight y');
              if(x<camx)
@@ -165,19 +169,24 @@ function p_det = cam_detect_prob(j)
              end
             obj= 0;
            
-            for m=initx:finx-1
+            for m=initx+1:finx-1
                 if(Map(m,y)>0)
                     obj= obj+1;
                 end
             end
             
             if(obj==0)
-                p_det = camera(i,3,:)/(finx-initx);
+                if(p_det>0)
+                p_det_u = p_det_u*p_det;
+                uy =1;
+                end;
+                p_det = p_det+camera(i,3,:)/abs(finx-initx);
+               
             end
-            
-      %  else
-      %      p_det = 0;
-            
+        end
+        
+        if (ux==1 || uy == 1)
+            p_det = p_det - p_det_u;
         end
     end
             
