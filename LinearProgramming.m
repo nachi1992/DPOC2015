@@ -36,7 +36,16 @@ NIteration = 10000;
 J_opt = zeros(n_states,1);
 u_opt_ind = zeros(n_states,1);
 U_cost=zeros(n_input,1);
+b = zeros(n_states*n_input,1);
+A = eye(n_states*n_input,n_states);
+f = ones(1,n_states);
 
+j=1; 
+a = [1 1 1 1 1]';
+for i=1:n_states
+A(j:j+4,i)= a;
+j=j+5;
+end
 
 for i=1:n_states
     
@@ -46,12 +55,12 @@ for i=1:n_states
                     for j = 1:n_states
                         U_cost(l) = U_cost(l)+ P(i,j,l)*J_opt(j);
                     end
+                    b(i)= U_cost(l);
                 end 
-                [J_opt(i)] = linprog(1,-1,U_cost(l));
+                
 end
-%f = ones(1, n_states);
-%A = ones(n_states,1);
-%[u_opt_ind,J_opt] = linprog(-f,A,min_u(1));
+[J_opt] = linprog(-f,A,b);
+
 end
 
 
