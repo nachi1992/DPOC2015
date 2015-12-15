@@ -32,34 +32,29 @@ function [ J_opt, u_opt_ind ] = LinearProgramming( P, G )
 % put your code here
 
 global n_states n_input;
-NIteration = 10000;
 J_opt = zeros(n_states,1);
 u_opt_ind = zeros(n_states,1);
-U_cost=zeros(n_input,1);
-%b = zeros(n_states*n_input,1);
-%A = eye(n_states*n_input,n_states);
+U_cost = zeros(n_input,1);
 f = ones(1,n_states);
 
-%j=1; 
-%a = [1 1 1 1 1]';
-%for i=1:n_states
-%A(j:j+4,i)= a;
-%j=j+5;
-%end
-A = eye(n_states);
-for i = 1:n_states
-    
+b= [] ; 
+p_x = [];
+
+            for l = 1:n_input
+                 b = [b ; G(:,l)]; 
+                  p_x = [p_x ; P(:,:,l)];
+            end
+            
+            A = repmat(eye(n_states),n_input,1) - p_x;
        
-       for l = 1:n_input
-                    for j = 1:n_states
-                        b(j) = G(i,l)+P(i,j,l)*J_opt(j);
-                        
-                    end
-                  [J_opt] = linprog(f,A,b);
-          
-       end            
-       
-end             
+            for i = 1:n_states
+                  [J_opt] = linprog(-f,A,b);      
+            end          
+   
+
+     for i = 1:n_states
+        [~,u_opt_ind(i)] = min(G(i,:) + sum(squeeze(P(i,:,:)) .* repmat(J_opt,1,n_input)));
+    end
                                      
 end
 
