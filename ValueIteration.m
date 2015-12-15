@@ -30,6 +30,34 @@ function [ J_opt, u_opt_ind ] = ValueIteration( P, G )
 %       	input for each element of the state space.
 
 % put your code here
+global n_states n_input;
+NIteration = 10000;
+J_opt = zeros(n_states,1);
+u_opt_ind = zeros(n_states,1);
+U_cost=zeros(n_input,1);
+
+for k = 1:NIteration
+     J_k = J_opt;   
+        
+            for i=1:n_states
+                for l = 1:n_input
+                    U_cost(l)= G(i,l);
+                    if(U_cost(l)== Inf)
+                        J_opt(i) = 100;
+                    end
+                    for j = 1:n_states
+                        U_cost(l) = U_cost(l)+ P(i,j,l)*J_opt(j);
+                    end
+                end
+                 min_u = U_cost((U_cost==min(U_cost)));
+                J_opt(i) = min_u(1);  
+            end
+            
+     if(norm((J_k-J_opt))<0.0000001)   
+         break;
+     end
+end
+    
 
 end
 

@@ -94,7 +94,7 @@ if true % Change this to true to test your implementation
 end
 
 %% solve stochastic shortest path problem
-valueIterationImplemented = false; % Change this to true to test your implementation
+valueIterationImplemented = true; % Change this to true to test your implementation
 if valueIterationImplemented
     disp('solve stochastic shortest path problem with Value Iteration');
     [ J_opt_vi, u_opt_ind_vi ] = ValueIteration( P, G );
