@@ -91,7 +91,7 @@ for l=1:n_input
                     end
                 
                 end
-                
+            
             end
                  
         end
@@ -175,6 +175,9 @@ function p_det = cam_detect_prob(j)
             if(obj==0) 
                 p_a(i) = (camera(i,3,:)/abs(finy-inity));    
             end
+         %   if(Map(x,y)<0)
+         %      p_a(i)= p_a(i)+((1-p_a(i))*p_a(i))+ (1-(1-p_a(i))*p_a(i)) + (1-(1-(1-p_a(i))*p_a(i))); 
+         %  end
         end
         
         if( y == camy)
@@ -197,7 +200,13 @@ function p_det = cam_detect_prob(j)
             if(obj==0)
                 p_a(i) = (camera(i,3,:)/abs(finx-initx));
             end
-        end            
+            
+          %  if(Map(x,y)<0)
+          %     p_a(i)= p_a(i)+((1-p_a(i))*p_a(i))+ (1-(1-p_a(i))*p_a(i)) + (1-(1-(1-p_a(i))*p_a(i))); 
+          % end
+        end  
+        
+           
     end
          p_a = p_a((p_a>0));
          if(size(p_a)>0)
