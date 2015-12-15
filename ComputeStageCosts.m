@@ -70,7 +70,7 @@ for l=1:n_input
              j = nextState(i,l);          
              
               if(j==0)
-                  G(i,l) = Inf;
+                  G(i,l) = 100;
               end
               if(j~=0) 
                   cost = 1;

@@ -31,5 +31,30 @@ function [ J_opt, u_opt_ind ] = LinearProgramming( P, G )
 
 % put your code here
 
+global n_states n_input;
+NIteration = 10000;
+J_opt = zeros(n_states,1);
+u_opt_ind = zeros(n_states,1);
+U_cost=zeros(n_input,1);
+
+
+for i=1:n_states
+    
+                for l = 1:n_input
+                    U_cost(l)= G(i,l);
+
+                    for j = 1:n_states
+                        U_cost(l) = U_cost(l)+ P(i,j,l)*J_opt(j);
+                    end
+                end 
+                [J_opt(i)] = linprog(1,-1,U_cost(l));
+end
+%f = ones(1, n_states);
+%A = ones(n_states,1);
+%[u_opt_ind,J_opt] = linprog(-f,A,min_u(1));
 end
 
+
+
+
+                 

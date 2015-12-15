@@ -42,10 +42,7 @@ for k = 1:NIteration
             for i=1:n_states
                 for l = 1:n_input
                     U_cost(l)= G(i,l);
-                    if(U_cost(l)== Inf)
-                        J_opt(i) = 100;
-                        U_cost(l)= 100;
-                    end
+
                     for j = 1:n_states
                         U_cost(l) = U_cost(l)+ P(i,j,l)*J_opt(j);
                     end

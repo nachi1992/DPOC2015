@@ -106,7 +106,7 @@ if policyIterationImplemented
     [ J_opt_pi, u_opt_ind_pi ] = PolicyIteration( P, G );
 end
 
-linearProgrammingImplemented = false; % Change this to true to test your implementation
+linearProgrammingImplemented = true; % Change this to true to test your implementation
 if linearProgrammingImplemented
     disp('solve stochastic shortest path problem with Linear Programming');
     [ J_opt_lp, u_opt_ind_lp ] = LinearProgramming( P, G );
