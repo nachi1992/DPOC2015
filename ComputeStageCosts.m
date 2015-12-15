@@ -46,7 +46,7 @@ global M;
 global N;
 global H;
 global space;
-global n_states;
+global n_states n_input;
 global camera;
 global Mansion;
 global Map;

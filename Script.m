@@ -100,7 +100,7 @@ if valueIterationImplemented
     [ J_opt_vi, u_opt_ind_vi ] = ValueIteration( P, G );
 end
 
-policyIterationImplemented = false; % Change this to true to test your implementation
+policyIterationImplemented = true; % Change this to true to test your implementation
 if policyIterationImplemented
     disp('solve stochastic shortest path problem with Policy Iteration');
     [ J_opt_pi, u_opt_ind_pi ] = PolicyIteration( P, G );
