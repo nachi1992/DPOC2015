@@ -34,7 +34,7 @@ detected_additional_time_steps = 8;	% additional time steps if detected and brou
 
 %% define problem size and generate map
 disp('generate map');
-shouldGenerateMap = false;
+shouldGenerateMap = true;
 if shouldGenerateMap
 	mapSize = [ 10, 15 ]; % [N, M]
 	[ map, gate, mansion, cameras ] = GenerateMap( ...
@@ -106,7 +106,7 @@ if policyIterationImplemented
     [ J_opt_pi, u_opt_ind_pi ] = PolicyIteration( P, G );
 end
 
-linearProgrammingImplemented = true; % Change this to true to test your implementation
+linearProgrammingImplemented = false; % Change this to true to test your implementation
 if linearProgrammingImplemented
     disp('solve stochastic shortest path problem with Linear Programming');
     [ J_opt_lp, u_opt_ind_lp ] = LinearProgramming( P, G );

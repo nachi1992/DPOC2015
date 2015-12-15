@@ -53,7 +53,7 @@ for k = 1:NIteration
                 u_opt_ind(i) = min_u_idx(1);
             end
             
-     if(norm((J_k-J_opt))<0.0000001)   
+     if(norm((J_k-J_opt))<0.00001)   
          break;
      end
 end

@@ -173,11 +173,13 @@ function p_det = cam_detect_prob(j)
              end
             
             if(obj==0) 
-                p_a(i) = (camera(i,3,:)/abs(finy-inity));    
+                p_a(i) = (camera(i,3,:)/abs(finy-inity)); 
+               
+                if(Map(x,y)<0)
+                p_a(i)= p_a(i)+((1-p_a(i))*p_a(i))+ (1-(1-p_a(i))*p_a(i)) + (1-(1-(1-p_a(i))*p_a(i))); 
+                end
             end
-         %   if(Map(x,y)<0)
-         %      p_a(i)= p_a(i)+((1-p_a(i))*p_a(i))+ (1-(1-p_a(i))*p_a(i)) + (1-(1-(1-p_a(i))*p_a(i))); 
-         %  end
+            
         end
         
         if( y == camy)
@@ -199,11 +201,13 @@ function p_det = cam_detect_prob(j)
             
             if(obj==0)
                 p_a(i) = (camera(i,3,:)/abs(finx-initx));
+                
+                if(Map(x,y)<0)
+                p_a(i)= p_a(i)+((1-p_a(i))*p_a(i))+ (1-(1-p_a(i))*p_a(i)) + (1-(1-(1-p_a(i))*p_a(i))); 
+                end
             end
             
-          %  if(Map(x,y)<0)
-          %     p_a(i)= p_a(i)+((1-p_a(i))*p_a(i))+ (1-(1-p_a(i))*p_a(i)) + (1-(1-(1-p_a(i))*p_a(i))); 
-          % end
+          
         end  
         
            
