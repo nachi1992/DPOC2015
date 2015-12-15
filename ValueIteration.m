@@ -44,13 +44,16 @@ for k = 1:NIteration
                     U_cost(l)= G(i,l);
                     if(U_cost(l)== Inf)
                         J_opt(i) = 100;
+                        U_cost(l)= 100;
                     end
                     for j = 1:n_states
                         U_cost(l) = U_cost(l)+ P(i,j,l)*J_opt(j);
                     end
                 end
                  min_u = U_cost((U_cost==min(U_cost)));
+                 min_u_idx = find(U_cost==min(U_cost));
                 J_opt(i) = min_u(1);  
+                u_opt_ind(i) = min_u_idx(1);
             end
             
      if(norm((J_k-J_opt))<0.0000001)   
