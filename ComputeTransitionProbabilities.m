@@ -62,26 +62,38 @@ N = size(Map,2);
 H = size(cameras,1);
 F = size(mansion,1);
 P = zeros(n_states,n_states,n_input);
+gate_state = cord2idx(gate(1),gate(2));
 for l=1:n_input
         for i = 1:n_states
             j = nextState(i,l);  
+           
+            p_det = cam_detect_prob(j);
             if(l==5)
                     pc = mansion_detect_prob(j);
-                    P(i,i,l)=1-pc;
+                    P(i,j,l)= 1-pc;
             else
                     P(i,j,l)= 1;
              end
-            p_det = cam_detect_prob(j);
-            gate_state = cord2idx(gate(1),gate(2));
+            
             if(p_det>0)
+                if(l==5)
+                    pc = mansion_detect_prob(j);
+                    P(i,gate_state,l)= p_det*(1-pc);
+                    P(i,j,l)= 1-((1-pc)*p_det);
+                    if(j==gate_state)
+                    P(i,j,l)= 1-pc;    
+                    end               
+                else                
+                    P(i,gate_state,l)= p_det;
+                    P(i,j,l)= 1- p_det;
+                    if(j==gate_state)
+                    P(i,j,l)= 1;    
+                    end
                 
-                P(i,gate_state,l)= p_det;
-                if(i~= gate_state)
-                P(i,j,l)= 1- p_det;
                 end
-            end 
-               
                 
+            end
+                 
         end
         
 end
@@ -160,13 +172,8 @@ function p_det = cam_detect_prob(j)
                  end
              end
             
-            if(obj==0)
-            %   if(p_det>0)
-            %    p_det_u = p_det_u*p_det;
-            %    ux =1;
-            %    end;    
+            if(obj==0) 
                 p_a(i) = (camera(i,3,:)/abs(finy-inity));    
-            
             end
         end
         
@@ -188,29 +195,16 @@ function p_det = cam_detect_prob(j)
              end
             
             if(obj==0)
-         %       if(p_det>0)
-         %       p_det_u = p_det_u*p_det;
-         %       uy =1;
-         %      end;
                 p_a(i) = (camera(i,3,:)/abs(finx-initx));
             end
-        end
-        
-     %   if (ux==1 || uy == 1)
-     %       p_det = p_det - p_det_u;
-     %   end
-     
+        end            
+    end
          p_a = p_a((p_a>0));
          if(size(p_a)>0)
-%             p_det = p_a;
-%         elseif(size(p_a)==2)
-%             p_det = p_a()
           p_det = probUnion(p_a);
          else
              p_det =0;
          end
-                
-    end
             
 end
 
@@ -222,12 +216,11 @@ global Map;
 global p_c;
 global gamma_p;
   [x,y]= idx2cord(i);   
-    pc = p_c;
-    
+    p_f = zeros(F,1);
     
     for i=1:F
-        manx = Mansion(i,1,:);
-        many = Mansion(i,2,:);
+        manx = Mansion(i,1);
+        many = Mansion(i,2);
            
         if(x== manx)
            
@@ -246,11 +239,10 @@ global gamma_p;
              end
             
             if(obj==0)
-             pc = max(p_c, gamma_p/abs(finy-inity));
+             p_f(i) = max(p_c, gamma_p/abs(finy-inity));
             else
-             pc=p_c;
+             p_f(i)=p_c;
             end
-            
         end
         
         if( y == many)
@@ -266,16 +258,21 @@ global gamma_p;
                  if(Map(m,y)>0)
                      obj= obj+1;
                  end
-             end
-            
+             end         
             if(obj==0)
-             pc = max(p_c, gamma_p/abs(finx-initx));
+             p_f(i) = max(p_c, gamma_p/abs(finx-initx));
             else
-             pc= p_c;
+             p_f(i)= p_c;
             end
         end
-    end   
-end
+    end
+          p_f = p_f((p_f>p_c));
+         if(size(p_f)>0)
+          pc = probUnion(p_f);
+         else
+          pc= p_c;
+         end 
+end 
 
 function prob = probUnion(probvec) 
   if (length(probvec) == 1)
